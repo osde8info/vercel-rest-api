@@ -13,5 +13,5 @@ export default function User() {
   if (error) return <div>Failed to load user</div>
   if (!data) return <div>Loading...</div>
 
-  return <div>{data.id} {data.name} {data.tel} {data.email} {data.address}</div>
+  return <div><a href="/">{data.id} {data.name} {data.tel} {data.email} {data.address}</a></div>
 }
