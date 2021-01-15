@@ -14,7 +14,7 @@ export default function Index() {
       {data.map((user) => (
         <li key={user.id}>
           <Link href="/user/[id]" as={`/user/${user.id}`}>
-            <a>{`User ${user.id}`}</a>
+            <a>{`${user.id} ${user.name} ${user.tel} ${user.email} ${user.address}`}</a>
           </Link>
         </li>
       ))}

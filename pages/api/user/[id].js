@@ -31,7 +31,7 @@ export default function userHandler(req, res) {
       let sql = "SELECT * FROM contacts where id=" + id
       let query = conn.query(sql, (err, results) => {
         if (err) throw err;
-        res.json(results)
+        res.json(results[0])
       });
       break
     case 'POST':
