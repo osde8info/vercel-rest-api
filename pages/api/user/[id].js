@@ -1,3 +1,4 @@
+import { parseBody } from 'next/dist/next-server/server/api-utils';
 
 const dotenv = require('dotenv')
 
@@ -8,8 +9,9 @@ const mysql = require('mysql');
 export default function userHandler(req, res) {
   // process user
   const {
-    query: { id, name },
     method,
+    query: { id, name, tel, mbl, fax },
+    body,
   } = req
 
   // Get data from your database
@@ -22,7 +24,6 @@ export default function userHandler(req, res) {
 
   conn.connect((err) => {
     if (err) throw err;
-    console.log('Mysql Connected...');
   });
 
   switch (method) {
@@ -31,21 +32,28 @@ export default function userHandler(req, res) {
       let sql = "SELECT * FROM contacts where id=" + id
       let query = conn.query(sql, (err, results) => {
         if (err) throw err;
-        res.json(results[0])
+        console.log(results[0])
+        const id = results[0].id
+        const name = results[0].name
+        res.json({ id: id, name: name })
       });
       break
+
     case 'POST':
       // Update or create data in your database
-      res.status(200).json({ id, name: name || `User ${id}` })
+      res.status(200)
       break
+
     case 'PUT':
       // Update or create data in your database
-      res.status(200).json({ id, name: name || `User ${id}` })
+      res.status(200)
       break
+
     case 'DELETE':
       // Update or create data in your database
-      res.status(200).json({ id, name: name || `User ${id}` })
+      res.status(200)
       break
+
     default:
       res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE'])
       res.status(405).end(`Method ${method} Not Allowed`)
