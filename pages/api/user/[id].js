@@ -1,12 +1,19 @@
 import { parseBody } from 'next/dist/next-server/server/api-utils';
 
 const dotenv = require('dotenv')
-
 dotenv.config()
 
-const mysql = require('mysql');
+const mysql = require('mysql2/promise');
 
-export default function userHandler(req, res) {
+const dbinfo =
+{
+  host: 'localhost',
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: 'phonebook',
+}
+
+export default async function userHandler(req, res) {
   // process user
   const {
     method,
@@ -14,44 +21,60 @@ export default function userHandler(req, res) {
     body,
   } = req
 
-  // Get data from your database
-  const conn = mysql.createConnection({
-    host: 'localhost',
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: 'phonebook',
-  });
-
-  conn.connect((err) => {
-    if (err) throw err;
-  });
+  const conn = await mysql.createConnection(dbinfo);
 
   switch (method) {
     case 'GET':
-      // Get data from your database
-      let sql = "SELECT * FROM contacts where id=" + id
-      let query = conn.query(sql, (err, results) => {
-        if (err) throw err;
-        console.log(results[0])
-        const id = results[0].id
-        const name = results[0].name
-        res.json({ id: id, name: name })
-      });
+      var [rows, fields] = await conn.execute('SELECT * FROM contacts where id=?', [id]);
+      await conn.end();
+      res.send(rows[0])
       break
 
     case 'POST':
-      // Update or create data in your database
-      res.status(200)
+      // create contact
+      try {
+        var rsh = await conn
+          .execute('insert into contacts(name,tel,mbl,fax) values (?,?,?,?)', [1, 2, 3, 4]);
+        //var [rows, fields] = await conn.execute('SELECT count(*) FROM contacts');
+        await conn.end();
+        res.status(200).send({})
+      }
+      catch (err) {
+        console.error(err)
+        await conn.end();
+        res.status(404).send({})
+      }
       break
 
     case 'PUT':
-      // Update or create data in your database
-      res.status(200)
+      // update contact
+      try {
+        var rsh = await conn
+          .execute('update contacts set name=?,tel=?,mbl=?,fax=? where id = ?', [10, 20, 30, 40, 12]);
+        //var [rows, fields] = await conn.execute('SELECT count(*) FROM contacts');
+        await conn.end()
+        res.status(200).send({})
+      }
+      catch (err) {
+        console.error(err)
+        await conn.end();
+        res.status(404).send({})
+      }
       break
 
     case 'DELETE':
-      // Update or create data in your database
-      res.status(200)
+      // delete contact
+      try {
+        var rsh = await conn
+          .execute('delete from contacts where id = ?', [99]);
+        await conn.end();
+        res.status(200).send({})
+      }
+      catch (err) {
+        console.error(err)
+        await conn.end();
+        res.status(404).send({})
+      }
       break
 
     default:

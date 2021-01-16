@@ -1,30 +1,20 @@
 
 const dotenv = require('dotenv')
-
 dotenv.config()
 
-const mysql = require('mysql');
+const mysql = require('mysql2/promise');
 
-export default function handler(req, res) {
-  // Get data from your database
-  const conn = mysql.createConnection({
-    host: 'localhost',
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: 'phonebook',
-  });
+const dbinfo =
+{
+  host: 'localhost',
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: 'phonebook',
+}
 
-  conn.connect((err) => {
-    if (err) throw err;
-    console.log('Mysql Connected...');
-  });
-
-  let sql = "SELECT * FROM contacts"
-  let query = conn.query(sql, (err, results) => {
-    if (err) throw err;
-    res.json(results)
-    //res.send(JSON.stringify({ "status": 200, "error": null, "response": results }));
-  });
-
-  
+export default async function handler(req, res) {
+  const conn = await mysql.createConnection(dbinfo);
+  const [rows, fields] = await conn.execute("SELECT * FROM contacts");
+  await conn.end();
+  res.send(rows)
 }
