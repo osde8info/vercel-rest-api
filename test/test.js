@@ -1,8 +1,10 @@
+
 const assert = require('assert');
 
 const sa = require('superagent');
 
 const url = 'localhost:3000'
+
 
 describe('true', function () {
   it('should return true', function () {
@@ -10,23 +12,36 @@ describe('true', function () {
   });
 });
 
-describe('select all', function () {
-  // callback
-  it('users', function () {
+
+describe('insert users', function () {
+  // promise with async/await
+  it('should return success', async function () {
     var res
-    sa.get(url + '/api/users')
-      .set('X-API-Key', 'foobar')
-      .set('accept', 'json')
-      .end((err, res) => {
-        if (err) throw err
-        //assert.strictEqual(res.body.length, 3)
-      })
-  })
+    try {
+      res = await sa
+        .post(url + '/api/user/0')
+        .send({ 'name': 'a1', 'tel': '123', 'mbl': '4', 'fax': '7' });
+      assert.strictEqual(res.status, 200)
+      res = await sa
+        .post(url + '/api/user/0')
+        .set('X-API-Key', 'foobar')
+        .send({ 'name': 'b2', 'tel': '123', 'mbl': '45', 'fax': '78' });
+      assert.strictEqual(res.status, 200)
+      res = await sa
+        .post(url + '/api/user/0')
+        .set('X-API-Key', 'foobar')
+        .send({ 'name': 'c3', 'tel': '123', 'mbl': '456', 'fax': '789' });
+      assert.strictEqual(res.status, 200)
+    } catch (err) {
+      //throw err;
+    }
+  });
 });
 
 describe('select all', function () {
   // callback
   it('users', function () {
+    var res
     sa.get(url + '/api/users')
       .set('X-API-Key', 'foobar')
       .set('accept', 'json')
@@ -68,21 +83,6 @@ describe('select user 2', function () {
   })
 });
 
-describe('insert user', function () {
-  // promise with async/await
-  it('should return success', async function () {
-    try {
-      const res = await sa
-        .post(url + '/api/user')
-        .set('X-API-Key', 'foobar')
-        .send({ 'name': 'a2', 'tel': '123', 'mbl': '456', 'fax': '789' });
-      assert.strictEqual(res.status, 200)
-    } catch (err) {
-      //throw err;
-    }
-  });
-});
-
 describe('update user 4', function () {
   // promise with async/await
   it('should return success', async function () {
@@ -97,6 +97,7 @@ describe('update user 4', function () {
     }
   })
 });
+
 
 describe('TEST DEL /user/4', function () {
   // promise with async/await

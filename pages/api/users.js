@@ -13,8 +13,15 @@ const dbinfo =
 }
 
 export default async function handler(req, res) {
-  const conn = await mysql.createConnection(dbinfo);
-  const [rows, fields] = await conn.execute("SELECT * FROM contacts");
-  await conn.end();
-  res.send(rows)
+  try {
+    const conn = await mysql.createConnection(dbinfo);
+    const [rows, fields] = await conn.execute("SELECT * FROM contacts");
+    await conn.end();
+    res.send(rows)
+  }
+  catch (err) {
+    console.error(err)
+    await conn.end();
+    res.status(404).send({})
+  }
 }

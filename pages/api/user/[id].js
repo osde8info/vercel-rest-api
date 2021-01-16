@@ -23,6 +23,8 @@ export default async function userHandler(req, res) {
 
   const conn = await mysql.createConnection(dbinfo);
 
+  console.log(method)
+
   switch (method) {
     case 'GET':
       try {
@@ -45,6 +47,7 @@ export default async function userHandler(req, res) {
             'insert into contacts(name,tel,mbl,fax) values (?,?,?,?)',
             [body.name, body.tel, body.mbl, body.fax]);
         await conn.end();
+        console.log(rsh[0].insertId)
         res.status(200).send({})
       }
       catch (err) {
