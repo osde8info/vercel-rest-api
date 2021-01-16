@@ -25,17 +25,25 @@ export default async function userHandler(req, res) {
 
   switch (method) {
     case 'GET':
-      var [rows, fields] = await conn.execute('SELECT * FROM contacts where id=?', [id]);
-      await conn.end();
-      res.send(rows[0])
+      try {
+        var [rows, fields] = await conn.execute('SELECT * FROM contacts where id=?', [id]);
+        await conn.end();
+        res.send(rows[0])
+      }
+      catch (err) {
+        console.error(err)
+        await conn.end();
+        res.status(404).send({})
+      }
       break
 
     case 'POST':
       // create contact
       try {
         var rsh = await conn
-          .execute('insert into contacts(name,tel,mbl,fax) values (?,?,?,?)', [1, 2, 3, 4]);
-        //var [rows, fields] = await conn.execute('SELECT count(*) FROM contacts');
+          .execute(
+            'insert into contacts(name,tel,mbl,fax) values (?,?,?,?)',
+            [body.name, body.tel, body.mbl, body.fax]);
         await conn.end();
         res.status(200).send({})
       }
@@ -50,8 +58,9 @@ export default async function userHandler(req, res) {
       // update contact
       try {
         var rsh = await conn
-          .execute('update contacts set name=?,tel=?,mbl=?,fax=? where id = ?', [10, 20, 30, 40, 12]);
-        //var [rows, fields] = await conn.execute('SELECT count(*) FROM contacts');
+          .execute(
+            'update contacts set name=?,tel=?,mbl=?,fax=? where id = ?',
+            [body.name, body.tel, body.mbl, body.fax, id]);
         await conn.end()
         res.status(200).send({})
       }
@@ -66,7 +75,7 @@ export default async function userHandler(req, res) {
       // delete contact
       try {
         var rsh = await conn
-          .execute('delete from contacts where id = ?', [99]);
+          .execute('delete from contacts where id = ?', [id]);
         await conn.end();
         res.status(200).send({})
       }
