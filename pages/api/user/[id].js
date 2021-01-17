@@ -47,8 +47,7 @@ export default async function userHandler(req, res) {
             'insert into contacts(name,tel,mbl,fax) values (?,?,?,?)',
             [body.name, body.tel, body.mbl, body.fax]);
         await conn.end();
-        console.log(rsh[0].insertId)
-        res.status(200).send({})
+        res.status(200).send({ id: rsh[0].insertId })
       }
       catch (err) {
         console.error(err)
@@ -65,7 +64,7 @@ export default async function userHandler(req, res) {
             'update contacts set name=?,tel=?,mbl=?,fax=? where id = ?',
             [body.name, body.tel, body.mbl, body.fax, id]);
         await conn.end()
-        res.status(200).send({})
+        res.status(200).send({ rows: rsh[0].affectedRows })
       }
       catch (err) {
         console.error(err)
@@ -80,7 +79,7 @@ export default async function userHandler(req, res) {
         var rsh = await conn
           .execute('delete from contacts where id = ?', [id]);
         await conn.end();
-        res.status(200).send({})
+        res.status(200).send({ rows: rsh[0].affectedRows })
       }
       catch (err) {
         console.error(err)
